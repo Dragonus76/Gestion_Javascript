@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<link rel="stylesheet" type="text/css" href="style.css">
+	<title>Gestion_Javascript</title>
+</head>
+<body>
+
+	<div id="Meteo5Jours"></div>
+
+<br clear="all">
+<div id="hFormu">
+    <div id="hVerres">
+        <label>Combien de verres de limonade veux-tu vendre cette semaine?
+            <br />
+            <input type="number" id="hNVerres" placeholder="Sois ambitieux !" />
+        </label>
+    </div>
+    <div id="hPrix">
+        <label>Quel prix au verre choisis-tu cette semaine?
+            <br />
+            <input type="number" id="hPrixVerre" placeholder="Au moins 0.5 (euro)" />
+        </label>
+    </div>
+    <button type="button" id="btnOuvrir">Ouverture du stand !</button>
+</div>
+<div id="divBilan">Bilan</div>
+
+
+<script type="text/javascript">
+
+	
+	//Récup du projet Meteo
+	
+	var jours = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi"];
+
+// Tableau de 8 ciels (Couvert, Pluie, etc.)
+var ciel  = ["Soleil", "Eclaircies", "Nuages épars", "Couvert", "Pluie", "Neige", "Orage", "Brume"];
+
+// Variables butées de température mini et max
+var maxTemp = 40;
+var minTemp = 5;
+
+// Coût de revient d'un verre de limonade
+var coutRevient = 0.5;
+
+// Tableau des températures des 5 jours
+var tabTempera = [];
+
+// Auditeur du bouton d'ouverture du stand
+document.getElementById("btnOuvrir").addEventListener("click", ouvrirStand);
+
+genererMeteo();
+
+
+
+
+	/**Généretion de prévisions pour 5 jours (voir Chap 17)**/
+	function genererMeteo() {
+    var mtDuJour;
+    var tmDuJour;
+		 for (var i = 0; i < jours.length; i++) {
+			 mtDuJour = ciel[Math.floor(Math.random() * ciel.length)];
+        tmDuJour = Math.floor(Math.random() * (maxTemp - minTemp) + minTemp);
+        tabTempera[i] = tmDuJour;
+
+
+			
+document.getElementById("Meteo5Jours").innerHTML += "<div id='" + jours[i] + "'class='" + mtDuJour + "'>prévisions du" + jours[i] + ":<br><br><br>" + mtDuJour + "," + tmDuJour + " degrés.</b></div>";
+		}
+	}
+
+
+
+	/** Calcul du nomre de verres vendus **/
+function ouvrirStand() {
+    var venteVerresJour = 0; // Par jour
+    var totalVerres = 0;     // Pour la semaine
+    var stockVerres = 0;     // Reste à vendre
+
+    // Nettoyage de la division d'affichage du bilan
+    viderRapport();
+
+    // Récupération des saisies
+    var approVerres = Number(document.getElementById("hNVerres").value);
+    var prixVente   = Number(document.getElementById("hPrixVerre").value);
+
+	
+		for (var i = 0; i < jours.length; i++) {
+
+
+			// La quantité vendue dépend de la température et du prix
+        venteVerresJour = Math.floor(tabTempera[i] / prixVente);
+
+        // Mise à jour du stock restant
+        stockVerres = approVerres - totalVerres;
+
+        // Impossible de vendre plus que le stock restant
+        if (venteVerresJour > stockVerres) {
+            venteVerresJour = stockVerres;
+        }
+        // Mise  jour du total de ventes hebdo
+       totalVerres = venteVerresJour + totalVerres;
+			
+			// Affichage des ventes du jour 
+document.getElementById("divBilan").innerHTML += "<p>Le " + jours[i] + ", tu as vendu " + venteVerresJour + " verres de limonade.</p>";
+			
+		}
+
+		afficherRapport(approVerres, prixVente, totalVerres);
+
+	}
+
+	/** Calcul du resultat et affichage du bilan **/
+
+	
+
+
+
+function afficherRapport(approSemaine, prixVente, qVendueSemaine) {
+    // Calcul de la rentabilité
+    var recette  = qVendueSemaine * prixVente;
+    var depense  = approSemaine   * coutRevient;
+    var reliquat = approSemaine   - qVendueSemaine;
+    var benefice = recette        - depense;
+
+    // Affichage du bilan hebdomadaire
+    document.getElementById("divBilan").innerHTML += "<p>BILAN : Tu as vendu dans la semaine " + qVendueSemaine + " verres de limonade.</p>";
+    document.getElementById("divBilan").innerHTML += "<p>Ta recette est de " + recette + "€.</p>";
+    document.getElementById("divBilan").innerHTML += "<p>Il te reste " + reliquat + " verres de limonade invendus.</p>";
+    document.getElementById("divBilan").innerHTML += "<p>Chaque verre t'a coûté " + coutRevient + "€. <b>Ton bénéfice net est de " + benefice + "€.</b>";
+}
+
+/** Nettoyage de la division pour nouvelle semaine **/
+function viderRapport() {
+  document.getElementById("divBilan").innerHTML = "";
+}
+
+
+
+
+</script>
+
+</body>
+</html>
